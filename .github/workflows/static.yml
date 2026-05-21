@@ -3,7 +3,7 @@ name: Deploy Static HTML Site
 on:
   push:
     branches:
-      - main  # Triggers deployment whenever you push changes to your main branch
+      - main
 
 jobs:
   deploy:
@@ -15,8 +15,7 @@ jobs:
       - name: Set Up SSH Key Configuration
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.MYSERVER }}
-
+          key: ${{ secrets.MYSERVER }}  # Matches your exact secret name
           known_hosts: 'placeholder'
           if_key_exists: replace
 
@@ -25,13 +24,14 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Push Files to Lightsail via Rsync
+      - name: Push Files Directly to Absolute Path via Rsync
         run: |
           rsync -avz --delete \
             --exclude '.git*' \
             --exclude '.github*' \
-            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/var/www/html/
+            --exclude '.user.ini' \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/awstest.work.gd/
 
-      - name: Fix Directory Ownership Rules
+      - name: Fix Directory Ownership Safely
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "sudo chown -R www:www /www/wwwroot/awstest.work.gd"
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "sudo find /www/wwwroot/awstest.work.gd -name '.user.ini' -prune -o -exec chown www:www {} + && sudo find /www/wwwroot/awstest.work.gd -name '.user.ini' -prune -o -exec chmod 755 {} +"
