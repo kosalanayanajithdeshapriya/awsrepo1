@@ -3,7 +3,7 @@ name: Deploy Static HTML Site
 on:
   push:
     branches:
-      - main  # Trigger deployment when pushing to the main branch
+      - main  # Triggers deployment whenever you push changes to your main branch
 
 jobs:
   deploy:
@@ -15,8 +15,7 @@ jobs:
       - name: Set Up SSH Key Configuration
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ secrets.MYSERVER }}  # Matches your exact secret name
-          name: id_ed25519             # CRITICAL FIX: Explicitly defines the ED25519 key format
+          key: ${{ secrets.MYSERVER }}  # References your updated RSA private key secret
           known_hosts: 'placeholder'
           if_key_exists: replace
 
