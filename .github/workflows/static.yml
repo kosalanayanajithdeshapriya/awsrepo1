@@ -24,9 +24,10 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Push Files Directly to Absolute Path via Rsync
+      - name: Push Files Directly via Rsync with Sudo
         run: |
           rsync -avz --delete \
+            --rsync-path="sudo rsync" \
             --exclude '.git*' \
             --exclude '.github*' \
             --exclude '.user.ini' \
